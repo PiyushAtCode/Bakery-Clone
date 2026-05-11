@@ -1,5 +1,5 @@
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
+if (process.env.NODE_ENV != "production") {  // ← spelling fix
+    require('dotenv').config()
 }
 
 const express = require('express');
@@ -10,8 +10,7 @@ const mongoose = require('mongoose');
 const ejsMate = require("ejs-mate");
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-// ✅ 1. connect-mongo ka sahi aur modern require syntax
-const MongoStore = require('connect-mongo'); 
+const MongoStore = require('connect-mongo');  // ← FIXED - no (session)
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
@@ -21,25 +20,24 @@ const productRoutes = require('./routes/product');
 const reviewRoutes = require('./routes/review');
 const userRoutes = require('./routes/user');
 
-// DB URL
 const dbUrl = process.env.ATLAS_URI;
 
-// MongoDB Connection
+// DB Connect
 main()
-.then(() => console.log("MongoDB Connected..."))
-.catch(err => console.log("MongoDB Connection Error: ", err));
+    .then(() => console.log("MongoDB Connected..."))
+    .catch(err => console.log(err));
 
 async function main() {
     await mongoose.connect(dbUrl);
 }
 
-// ✅ 2. MongoStore ka modern/sahi initialization (Vercel ke liye 100% stable)
-const store = MongoStore.create({
-    mongoUrl: dbUrl,
+// ✅ FIXED MongoStore
+const store = MongoStore.create({   // ← new MongoStore() nahi, .create() use karo
+    mongoUrl: dbUrl,                // ← mongooseConnection nahi, mongoUrl use karo
+    touchAfter: 24 * 60 * 60,
     crypto: {
-        secret: process.env.session_secret || 'fallbackSecretKey'
-    },
-    touchAfter: 24 * 3600 // seconds me
+        secret: process.env.session_secret
+    }
 });
 
 store.on("error", function (e) {
@@ -47,12 +45,13 @@ store.on("error", function (e) {
 });
 
 const sessionOptions = {
-    store: store,
-    secret: process.env.session_secret || 'fallbackSecretKey',
+    store,
+    secret: process.env.session_secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
+        secure: process.env.NODE_ENV === "production",  // ← Vercel ke liye zaroori
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
@@ -83,13 +82,8 @@ app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     res.locals.currentUser = req.user;
-    res.locals.search = "";  
+    res.locals.search = "";
     next();
-});
-
-// ✅ 3. Root Route Redirect (Website khulne par seedha /products par bhejne ke liye)
-app.get('/', (req, res) => {
-    res.redirect('/products');
 });
 
 // Routes
@@ -97,12 +91,12 @@ app.use("/products", productRoutes);
 app.use("/products/:id/reviews", reviewRoutes);
 app.use("/", userRoutes);
 
-// 404 handler
+// 404 Handler
 app.use((req, res) => {
     res.status(404).send("Page Not Found!");
 });
 
-// Error middleware
+// Error Middleware
 app.use((err, req, res, next) => {
     console.log("ERROR:", err);
     let statusCode = err.statusCode || err.status || 500;
@@ -110,8 +104,8 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render("error.ejs", { message });
 });
 
-// ✅ 4. Port Configuration (Vercel ke liye process.env.PORT compulsory hai)
-const port = process.env.PORT || 8080;
+// Server
+const port = process.env.PORT || 8080;  // ← Vercel ke liye PORT env use karo
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
