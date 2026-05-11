@@ -1,6 +1,7 @@
-if (process.env.NODE_ENV != "production") {
-    require('dotenv').config()
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
 }
+
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -9,34 +10,36 @@ const mongoose = require('mongoose');
 const ejsMate = require("ejs-mate");
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
+// ✅ 1. connect-mongo ka sahi aur modern require syntax
+const MongoStore = require('connect-mongo'); 
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
+
 const productRoutes = require('./routes/product');
 const reviewRoutes = require('./routes/review');
 const userRoutes = require('./routes/user');
 
-// ✅ 1. dbUrl define karo
+// DB URL
 const dbUrl = process.env.ATLAS_URI;
 
-// ✅ 2. DB connect
+// MongoDB Connection
 main()
 .then(() => console.log("MongoDB Connected..."))
-.catch(err => console.log(err));
+.catch(err => console.log("MongoDB Connection Error: ", err));
 
 async function main() {
     await mongoose.connect(dbUrl);
 }
 
-// ✅ 3. MongoStore
+// ✅ 2. MongoStore ka modern/sahi initialization (Vercel ke liye 100% stable)
 const store = MongoStore.create({
     mongoUrl: dbUrl,
-    touchAfter: 24 * 60 * 60,
     crypto: {
-        secret: process.env.session_secret
-    }
+        secret: process.env.session_secret || 'fallbackSecretKey'
+    },
+    touchAfter: 24 * 3600 // seconds me
 });
 
 store.on("error", function (e) {
@@ -44,8 +47,8 @@ store.on("error", function (e) {
 });
 
 const sessionOptions = {
-    store,
-    secret: process.env.session_secret,
+    store: store,
+    secret: process.env.session_secret || 'fallbackSecretKey',
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -55,43 +58,51 @@ const sessionOptions = {
     }
 };
 
-// ✅ 4. Middleware
+// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
+
 app.set('view engine', 'ejs');
 app.engine('ejs', ejsMate);
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(cookieParser());
 app.use(session(sessionOptions));
 app.use(flash());
+
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// ✅ 5. Locals
+// Locals
 app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     res.locals.currentUser = req.user;
-    res.locals.search = "";
+    res.locals.search = "";  
     next();
 });
 
-// ✅ 6. Routes
+// ✅ 3. Root Route Redirect (Website khulne par seedha /products par bhejne ke liye)
+app.get('/', (req, res) => {
+    res.redirect('/products');
+});
+
+// Routes
 app.use("/products", productRoutes);
 app.use("/products/:id/reviews", reviewRoutes);
 app.use("/", userRoutes);
 
-// ✅ 7. 404 handler
+// 404 handler
 app.use((req, res) => {
     res.status(404).send("Page Not Found!");
 });
 
-// ✅ 8. Error middleware
+// Error middleware
 app.use((err, req, res, next) => {
     console.log("ERROR:", err);
     let statusCode = err.statusCode || err.status || 500;
@@ -99,7 +110,7 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render("error.ejs", { message });
 });
 
-// ✅ 9. Server
+// ✅ 4. Port Configuration (Vercel ke liye process.env.PORT compulsory hai)
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
