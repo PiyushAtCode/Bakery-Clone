@@ -1,7 +1,6 @@
-if (process.env.NODE_ENV != "producation") {
+if (process.env.NODE_ENV != "production") {
     require('dotenv').config()
 }
-
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -10,17 +9,16 @@ const mongoose = require('mongoose');
 const ejsMate = require("ejs-mate");
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
 const User = require('./models/user');
-
 const productRoutes = require('./routes/product');
 const reviewRoutes = require('./routes/review');
 const userRoutes = require('./routes/user');
 
-// ✅ 1. pehle dbUrl define karo
+// ✅ 1. dbUrl define karo
 const dbUrl = process.env.ATLAS_URI;
 
 // ✅ 2. DB connect
@@ -33,8 +31,8 @@ async function main() {
 }
 
 // ✅ 3. MongoStore
-const store = new MongoStore({
-    mongooseConnection: mongoose.connection,
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
     touchAfter: 24 * 60 * 60,
     crypto: {
         secret: process.env.session_secret
@@ -61,16 +59,13 @@ const sessionOptions = {
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
-
 app.set('view engine', 'ejs');
 app.engine('ejs', ejsMate);
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(cookieParser());
 app.use(session(sessionOptions));
 app.use(flash());
-
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
@@ -82,7 +77,7 @@ app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     res.locals.currentUser = req.user;
-    res.locals.search = "";  // ✅ search bar ke liye
+    res.locals.search = "";
     next();
 });
 
@@ -105,7 +100,7 @@ app.use((err, req, res, next) => {
 });
 
 // ✅ 9. Server
-const port = 8080;
+const port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
