@@ -1,0 +1,54 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container my-5">
+    <div class="form-wrapper shadow-sm p-4 rounded-4 bg-white mx-auto" style="max-width: 550px;">
+        <h2 class="text-center mb-4" style="color: #d2691e;">Create New Product</h2>
+
+        <form action="/products" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
+            
+            <div class="mb-3">
+                <label class="form-label fw-bold">Product Name</label>
+                <input type="text" name="product[name]" class="form-control" placeholder="e.g. Chocolate Truffle" required>
+                <div class="valid-feedback">Looks good !</div>
+                <div class="invalid-feedback">Please enter product name</div>
+            </div>
+
+            <div class="mb-3"> 
+                <label class="form-label fw-bold">Price (₹)</label>
+                <input type="number" name="product[price]" step="0.01" min="0" class="form-control" placeholder="0.00" required>
+                <div class="invalid-feedback">Please enter a vaild price</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Category</label>
+                <select name="product[category]" class="form-select" required>
+                    <option value="" selected disabled>-- Select Category --</option>
+                    <option value="Pastries">Pastries</option>
+                    <option value="Cakes">Cakes</option>
+                    <option value="Breads">Breads</option>
+                    <option value="Cookies">Cookies</option>
+                    <option value="Biscuits">Biscuits</option>
+                    <option value="Chocolates">Chocolates</option>
+                </select>
+                <div class="invalid-feedback">Please Select Category</div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Description</label>
+                <textarea name="product[description]" class="form-control" rows="3" placeholder="Tell us about this delight..." required></textarea>
+                <div class="valid-feedback">Looks goods!</div>
+                <div class="invalid-feedback">Please enter description</div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Image URL</label>
+                <input type="file" name="product[image]" class="form-control" >
+            </div>
+
+            <button type="submit" class="btn btn-warning w-100 fw-bold py-2 shadow-sm add-btn">
+                Create Product
+            </button>
+
+        </form>
+    </div>
+</div>

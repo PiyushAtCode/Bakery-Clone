@@ -1,0 +1,29 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container my-5">
+    <div class="form-wrapper shadow-sm p-4 rounded-4 bg-white mx-auto" style="max-width: 500px;">
+        <h2 class="text-center mb-4" style="color: #d2691e;">Welcome Back!</h2>
+
+        <form action="/login" method="POST" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Username</label>
+                <input type="text" name="username" class="form-control" required>
+                <div class="invalid-feedback">
+                    Please enter your username.
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Password</label>
+                <input type="password" name="password" class="form-control" required>
+                <div class="invalid-feedback">
+                    Please enter your password.
+                </div>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-warning fw-bold py-2 shadow-sm">Login</button>
+            </div>
+        </form>
+    </div>
+</div>

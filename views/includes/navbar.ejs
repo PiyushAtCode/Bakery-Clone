@@ -1,0 +1,85 @@
+<style>
+.search-box{
+    flex: 1;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.search-input{
+    border-radius: 30px;
+    padding: 10px 20px;
+    height: 45px;
+    border: 1px solid #ddd;
+}
+
+.search-btn{
+    border-radius: 30px;
+    height: 45px;
+    padding: 0 22px;
+    background-color: #ffc107;
+    border: none;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.search-btn:hover{
+    background-color: #e0a800;
+}
+</style>
+
+
+<nav class="navbar navbar-expand-md navbar-light bg-white sticky-top custom-nav">
+  <div class="container-fluid px-md-4">
+
+    <!-- Logo -->
+    <a class="navbar-brand d-flex align-items-center ms-0" href="">
+      <img src="/images/bakery.png" alt="Bakery Logo" height="35" class="me-2">
+      <span class="brand-text">Bake<span class="text-warning">Station</span></span>
+    </a>
+
+    <!-- Toggle Button -->
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+      data-bs-target="#navbarNavAltMarkup">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar Content -->
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+
+      <!-- Left Side -->
+      <div class="navbar-nav align-items-center">
+        <a class="nav-link px-3" href="/products">All Products</a>
+
+        <a class="nav-link btn btn-warning btn-sm ms-md-2 px-4 text-dark add-btn" href="/products/new">
+          + Add Product
+        </a>
+      </div>
+
+<form class="d-flex search-box" role="search" action="/products" method="GET">
+  <input 
+    class="form-control me-2 search-input" 
+    type="search" 
+    name="search"
+    placeholder="Search products..."
+  >
+
+  <button class="btn search-btn d-flex align-items-center gap-2" type="submit">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span>Search</span>
+  </button>
+
+</form>
+
+      <!-- Right Side -->
+      <div class="navbar-nav ms-auto align-items-center">
+        <% if(!currentUser){ %>
+          <a class="nav-link" href="/signup"><b>Sign Up</b></a>
+          <a class="nav-link" href="/login"><b>Login</b></a>
+        <% } else { %>
+          <a class="nav-link" href="/logout"><b>Logout</b></a>
+        <% } %>
+      </div>
+
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,51 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container my-5">
+    <div class="form-wrapper shadow-sm p-4 rounded-4 bg-white mx-auto fade-in" style="max-width: 550px;">
+        <h2 class="text-center mb-4" style="color: #d2691e;">Edit Product</h2>
+
+        <form action="/products/<%= product._id %>?_method=PUT" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
+            
+            <div class="mb-3">
+                <label class="form-label fw-bold">Product Name</label>
+                <input type="text" name="product[name]" class="form-control" value="<%= product.name %>" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Category</label>
+                <select name="product[category]" class="form-select" required>
+                    <option value="Pastries" <%= product.category === 'Pastries' ? 'selected' : '' %>>Pastries</option>
+                    <option value="Cakes" <%= product.category === 'Cakes' ? 'selected' : '' %>>Cakes</option>
+                    <option value="Breads" <%= product.category === 'Breads' ? 'selected' : '' %>>Breads</option>
+                    <option value="Cookies" <%= product.category === 'Cookies' ? 'selected' : '' %>>Cookies</option>
+                    <option value="Biscuits" <%= product.category === 'Biscuits' ? 'selected' : '' %>>Biscuits</option>
+                    <option value="Chocolates" <%= product.category === 'Chocolates' ? 'selected' : '' %>>Chocolates</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Description</label>
+                <textarea name="product[description]" class="form-control" rows="3"><%= product.description %></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Price (₹)</label>
+                <input type="number" name="product[price]" step="0.01" class="form-control" value="<%= product.price %>" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-bold">Upload Image </label>
+                <input type="file" name="product[image]" class="form-control">
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-success fw-bold py-2 shadow-sm">
+                    Update Product
+                </button>
+                <a href="/products/<%= product._id %>/show" class="btn btn-outline-secondary btn-sm border-0">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>

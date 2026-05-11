@@ -1,0 +1,117 @@
+<% layout('layouts/boilerplate') %>
+
+    <div class="container py-5 fade-in">
+        <div class="glass-card">
+            <div class="row align-items-center">
+
+                <div class="col-md-6">
+                    <div class="img-wrapper">
+                        <img src="<%= product.image.url %>" alt="<%= product.name %>" class="product-img">
+                    </div>
+                </div>
+
+                <div class="col-md-6 details">
+                    <h1 class="product-title">
+                        <%= product.name %>
+                    </h1>
+
+                    <div>
+                        <i class="bi bi-person"></i>
+                        <span class="owner-name"><%= product.owner.username %></span>
+                    </div>
+
+                    <div class="category-badge">
+                        <i class="bi bi-tag"></i>
+                        <%= product.category %>
+                    </div>
+
+                    <p class="description">
+                        <%= product.description %>
+                    </p>
+
+                    <div class="price">
+                        ₹ <%= product.price %>
+                    </div>
+                    <% if (currentUser && currentUser._id.equals(product.owner._id)) { %>
+                    <div class="d-flex gap-2 mt-4 flex-wrap">
+                        <a href="/products" class="btn btn-modern btn-back text-decoration-none">
+                            <i class="bi bi-arrow-left"></i> Back
+                        </a>
+                        <a href="/products/<%= product._id %>/edit"
+                            class="btn btn-modern btn-edit text-decoration-none">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+
+                        <form action="/products/<%= product._id %>?_method=DELETE" method="POST" class="d-inline">
+                            <button class="btn btn-modern btn-delete">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </form>
+                    <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% if (currentUser) { %>
+        <hr class="my-5 opacity-25">
+        <div class="col-md-6">
+            <h4>Leave a Review</h4>
+            <form action="/products/<%= product._id %>/reviews" method="post" class="needs-validation" novalidate>
+                <!-- <div>
+                    <label for="rating" class="form-label">Rating</label>
+                    <input type="range" min="1" max="5" name="review[rating]" id="rating" class="form-range">
+                </div> -->
+            <div>
+                <label for="rating" class="form-label">Rating</label>
+            <fieldset class="starability-slot">
+                <legend>First rating:</legend>
+                <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                <label for="first-rate1" title="Terrible">1 star</label>
+                <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                <label for="first-rate2" title="Not good">2 stars</label>
+                <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                <label for="first-rate3" title="Average">3 stars</label>
+                <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                <label for="first-rate4" title="Very good">4 stars</label>
+                <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                <label for="first-rate5" title="Amazing">5 stars</label>
+            </fieldset>
+            </div>
+            <br>
+                <div>
+                    <label for="comment" class="form-label">Comments</label>
+                    <textarea class="form-control custom-textarea" id="comment" rows="3" name="review[comment]"
+                        required></textarea>
+                    <div class="invalid-feedback">
+                        Please enter a comment.
+                    </div>
+                </div><br>
+                <button type="submit" class="btn btn-modern btn-success ">Submit Review</button>
+            </form>
+        </div>
+        <% } %>
+        <hr class="my-5 opacity-25">
+
+        <p class="h4 mb-4"><b>All Reviews</b></p>
+
+        <div class="reviews-wrapper-grid">
+            <% for(review of product.reviews) { %>
+                <div class="review-card-modern">
+                    <div class="review-content">
+                        <h5 class="reviewer-name"><%= review.author.username %></h5>
+                        <p class="review-text">
+                            <%= review.comment %>
+                        </p>
+                        <p class="starability-result" data-rating="<%= review.rating %>"></p>
+                    </div>
+
+                    <form action="/products/<%= product._id %>/reviews/<%= review._id %>?_method=DELETE" method="post"
+                        class="mt-2">
+                        <button class="btn-delete-minimal">Delete</button>
+                    </form>
+                </div>
+                <% } %>
+        </div>
+        <br>
+    </div>
