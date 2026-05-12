@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-// ✅ Correct
-const passportLocalMongoose = require("passport-local-mongoose").default;
 
+const passportLocalMongoose = require('passport-local-mongoose');
 
 const UserSchema = new Schema({
     email: {
@@ -12,7 +11,6 @@ const UserSchema = new Schema({
     }
 });
 
-UserSchema.plugin(passportLocalMongoose); // username, password fields add karega
+UserSchema.plugin(passportLocalMongoose);
 
 module.exports = mongoose.model('User', UserSchema);
-

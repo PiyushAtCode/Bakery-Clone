@@ -1,4 +1,4 @@
-if (process.env.NODE_ENV != "production") {  // ← spelling fix
+if (process.env.NODE_ENV != "production") {
     require('dotenv').config()
 }
 
@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 const ejsMate = require("ejs-mate");
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const MongoStore = require('connect-mongo');  // ← FIXED - no (session)
+const MongoStore = require('connect-mongo')(session);
 const flash = require('connect-flash');
 const passport = require('passport');
 const LocalStrategy = require('passport-local');
@@ -20,20 +20,21 @@ const productRoutes = require('./routes/product');
 const reviewRoutes = require('./routes/review');
 const userRoutes = require('./routes/user');
 
+// DB URL
 const dbUrl = process.env.ATLAS_URI;
 
 // DB Connect
 main()
-    .then(() => console.log("MongoDB Connected..."))
-    .catch(err => console.log(err));
+.then(() => console.log("MongoDB Connected..."))
+.catch(err => console.log(err));
 
 async function main() {
     await mongoose.connect(dbUrl);
 }
 
-// ✅ FIXED MongoStore
-const store = MongoStore.create({   // ← new MongoStore() nahi, .create() use karo
-    mongoUrl: dbUrl,                // ← mongooseConnection nahi, mongoUrl use karo
+// MongoStore
+const store = new MongoStore({
+    mongooseConnection: mongoose.connection,
     touchAfter: 24 * 60 * 60,
     crypto: {
         secret: process.env.session_secret
@@ -51,7 +52,6 @@ const sessionOptions = {
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",  // ← Vercel ke liye zaroori
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7
     }
@@ -73,6 +73,7 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
@@ -105,7 +106,8 @@ app.use((err, req, res, next) => {
 });
 
 // Server
-const port = process.env.PORT || 8080;  // ← Vercel ke liye PORT env use karo
+const port = 8080;
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
